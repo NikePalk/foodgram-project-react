@@ -23,7 +23,7 @@ from .serializers import (CreateRecipeSerializer, FavoriteSerializer,
 
 
 class SubscribeView(APIView):
-    """ Операция подписки/отписки. """
+    """ Подписка/отписка. """
 
     permission_classes = [IsAuthenticated, ]
 
@@ -53,7 +53,7 @@ class SubscribeView(APIView):
 
 
 class ShowSubscriptionsView(ListAPIView):
-    """ Отображение подписок. """
+    """ Получение подписок. """
 
     permission_classes = [IsAuthenticated, ]
     pagination_class = CustomPagination
@@ -69,7 +69,7 @@ class ShowSubscriptionsView(ListAPIView):
 
 
 class FavoriteView(GetObjectMixin, APIView):
-    """ Добавление/удаление рецепта из избранного. """
+    """ Добавление/удаление рецепта в/из избранного. """
 
     permission_classes = [IsAuthenticated, ]
     pagination_class = CustomPagination
@@ -80,11 +80,11 @@ class FavoriteView(GetObjectMixin, APIView):
 
     def delete(self, request, id):
         recipe = get_object_or_404(Recipe, id=id)
-        return self.del_recipe(Favorite, recipe)
+        return self.del_recipe(Favorite, None)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
-    """ Отображение тегов. """
+    """ Получение тегов. """
 
     permission_classes = [AllowAny, ]
     pagination_class = None
@@ -93,7 +93,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    """ Отображение ингредиентов. """
+    """ Получение ингредиентов. """
 
     permission_classes = [AllowAny, ]
     pagination_class = None
@@ -104,7 +104,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    """ Операции с рецептами: добавление/изменение/удаление/просмотр. """
+    """ Работа с рецептами: добавление/изменение/удаление/просмотр. """
 
     permission_classes = [IsAuthorOrAdminOrReadOnly, ]
     pagination_class = CustomPagination
@@ -124,7 +124,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 class ShoppingCartView(GetObjectMixin, APIView):
-    """ Добавление рецепта в корзину или его удаление. """
+    """ Добавление/удаление рецепта в/из корзины. """
 
     permission_classes = [IsAuthenticated, ]
 
@@ -134,11 +134,13 @@ class ShoppingCartView(GetObjectMixin, APIView):
 
     def delete(self, request, id):
         recipe = get_object_or_404(Recipe, id=id)
-        return self.del_recipe(ShoppingCart, recipe)
+        return self.del_recipe(ShoppingCart, None)
 
 
 @api_view(['GET'])
 def download_shopping_cart(request):
+    """ Скачать список покупок. """
+
     ingredient_list = "Cписок покупок:"
     ingredients = RecipeIngredient.objects.filter(
         recipe__shopping_cart__user=request.user
