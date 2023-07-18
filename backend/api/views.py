@@ -9,16 +9,16 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingCart, Tag)
+from recipes.models import (Ingredient, Recipe, RecipeIngredient,
+                            Tag)
 from users.models import Subscription, User
 from .filters import IngredientFilter, RecipeFilter
 from .mixins import GetObjectMixin
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrAdminOrReadOnly
-from .serializers import (CreateRecipeSerializer, FavoriteSerializer,
+from .serializers import (CreateRecipeSerializer,
                           IngredientSerializer, RecipeSerializer,
-                          ShoppingCartSerializer, ShowSubscriptionsSerializer,
+                          ShowSubscriptionsSerializer,
                           SubscriptionSerializer, TagSerializer)
 
 
@@ -74,13 +74,11 @@ class FavoriteView(GetObjectMixin, APIView):
     permission_classes = [IsAuthenticated, ]
     pagination_class = CustomPagination
 
-    def post(self, request, id):
-        recipe = get_object_or_404(Recipe, id=id)
-        return self.post_recipe(Favorite, FavoriteSerializer)
+    def post(self):
+        return self.post_recipe(self.request, id)
 
-    def delete(self, request, id):
-        recipe = get_object_or_404(Recipe, id=id)
-        return self.del_recipe(Favorite, None)
+    def delete(self):
+        return self.del_recipe(self.request, id)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -128,13 +126,11 @@ class ShoppingCartView(GetObjectMixin, APIView):
 
     permission_classes = [IsAuthenticated, ]
 
-    def post(self, request, id):
-        recipe = get_object_or_404(Recipe, id=id)
-        return self.post_recipe(ShoppingCart, ShoppingCartSerializer)
+    def post(self):
+        return self.post_recipe(self.request, id)
 
-    def delete(self, request, id):
-        recipe = get_object_or_404(Recipe, id=id)
-        return self.del_recipe(ShoppingCart, None)
+    def delete(self):
+        return self.del_recipe(self.request, id)
 
 
 @api_view(['GET'])
