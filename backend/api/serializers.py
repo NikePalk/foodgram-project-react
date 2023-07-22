@@ -93,7 +93,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     tags = TagSerializer(many=True)
     author = CustomUserSerializer(read_only=True)
-    ingredients = AddIngredientRecipeSerializer(many=True)
+    ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField(
         method_name='get_is_favorited')
     is_in_shopping_cart = serializers.SerializerMethodField(
@@ -113,6 +113,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time'
         ]
+
+    def get_ingredients(self, obj):
+        ingredients = RecipeIngredient.objects.filter(recipe=obj)
+        return RecipeIngredientSerializer(ingredients, many=True).data
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')

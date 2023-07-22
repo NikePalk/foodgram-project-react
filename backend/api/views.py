@@ -9,16 +9,16 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from recipes.models import (Ingredient, Recipe, RecipeIngredient,
-                            Tag)
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
 from users.models import Subscription, User
 from .filters import IngredientFilter, RecipeFilter
 from .mixins import GetObjectMixin
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrAdminOrReadOnly
-from .serializers import (CreateRecipeSerializer,
+from .serializers import (CreateRecipeSerializer, FavoriteSerializer,
                           IngredientSerializer, RecipeSerializer,
-                          ShowSubscriptionsSerializer,
+                          ShoppingCartSerializer, ShowSubscriptionsSerializer,
                           SubscriptionSerializer, TagSerializer)
 
 
@@ -73,12 +73,14 @@ class FavoriteView(GetObjectMixin, APIView):
 
     permission_classes = [IsAuthenticated, ]
     pagination_class = CustomPagination
+    model_class = Favorite
+    model_serializer = FavoriteSerializer
 
-    def post(self):
-        return self.post_recipe(self.request, id)
+    def post(self, request, id):
+        return self.post_recipe(request, id)
 
-    def delete(self):
-        return self.del_recipe(self.request, id)
+    def delete(self, request, id):
+        return self.del_recipe(request, id)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -125,12 +127,14 @@ class ShoppingCartView(GetObjectMixin, APIView):
     """ Добавление/удаление рецепта в/из корзины. """
 
     permission_classes = [IsAuthenticated, ]
+    model_class = ShoppingCart
+    model_serializer = ShoppingCartSerializer
 
-    def post(self):
-        return self.post_recipe(self.request, id)
+    def post(self, request, id):
+        return self.post_recipe(request, id)
 
-    def delete(self):
-        return self.del_recipe(self.request, id)
+    def delete(self, request, id):
+        return self.del_recipe(request, id)
 
 
 @api_view(['GET'])
